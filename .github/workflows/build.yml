@@ -14,9 +14,19 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y build-essential git zip unzip openjdk-11-jdk python3-pip
-        pip install cython==0.29.33
+        pip install Cython==0.29.33
         pip install virtualenv
         pip install buildozer
+
+    - name: Install Android SDK
+      run: |
+        mkdir -p ~/.buildozer/android/platform
+        cd ~/.buildozer/android/platform
+        wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O cmdline-tools.zip
+        unzip cmdline-tools.zip
+        mkdir -p android-sdk/cmdline-tools
+        mv cmdline-tools android-sdk/cmdline-tools/latest
+        yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk "platform-tools" "platforms;android-31" "build-tools;31.0.0"
 
     - name: Build APK
       run: |
