@@ -18,7 +18,7 @@ jobs:
         pip install virtualenv
         pip install buildozer
 
-    - name: Install Android SDK
+    - name: Install Android SDK manually
       run: |
         mkdir -p ~/.buildozer/android/platform
         cd ~/.buildozer/android/platform
@@ -26,7 +26,13 @@ jobs:
         unzip cmdline-tools.zip
         mkdir -p android-sdk/cmdline-tools
         mv cmdline-tools android-sdk/cmdline-tools/latest
-        yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk "platform-tools" "platforms;android-31" "build-tools;31.0.0"
+
+        # لینک جعلی برای old path که Buildozer بهش نگاه می‌کنه
+        mkdir -p android-sdk/tools/bin
+        ln -s $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager android-sdk/tools/bin/sdkmanager
+
+        # نصب ابزارها
+        yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
 
     - name: Build APK
       run: |
