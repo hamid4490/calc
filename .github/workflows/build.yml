@@ -1,0 +1,30 @@
+name: Build APK with Buildozer
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential git zip unzip openjdk-11-jdk python3-pip
+        pip install cython==0.29.33
+        pip install virtualenv
+        pip install buildozer
+
+    - name: Build APK
+      run: |
+        sudo apt install -y libncurses5 # مهم برای ارورهای runtime
+        buildozer android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: my-app
+        path: bin/*.apk
