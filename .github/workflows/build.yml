@@ -20,7 +20,6 @@ jobs:
 
     - name: Build APK
       run: |
-        sudo apt install -y libncurses5 # مهم برای ارورهای runtime
         buildozer android debug
 
     - name: Upload APK
