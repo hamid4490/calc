@@ -7,39 +7,44 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y build-essential git zip unzip openjdk-11-jdk python3-pip
-        pip install Cython==0.29.33
-        pip install virtualenv
-        pip install buildozer
+        sudo apt install -y build-essential zip unzip openjdk-11-jdk python3-pip git ant
+        pip install --upgrade pip
+        pip install Cython==0.29.33 virtualenv buildozer
 
-    - name: Install Android SDK manually
+    - name: Install Android SDK and Build-tools
       run: |
         mkdir -p ~/.buildozer/android/platform
         cd ~/.buildozer/android/platform
         wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O cmdline-tools.zip
-        unzip cmdline-tools.zip
+        unzip -q cmdline-tools.zip -d cmdline-tools
         mkdir -p android-sdk/cmdline-tools
         mv cmdline-tools android-sdk/cmdline-tools/latest
 
-        # لینک جعلی برای old path که Buildozer بهش نگاه می‌کنه
+        # شبیه‌سازی مسیر قدیمی برای Buildozer
         mkdir -p android-sdk/tools/bin
         ln -s $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager android-sdk/tools/bin/sdkmanager
 
-        # نصب ابزارها
-        yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk "platform-tools" "platforms;android-31" "build-tools;31.0.0" "ndk;23.1.7779620"
+        # نصب SDKهای لازم
+        yes | android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=android-sdk \
+          "platform-tools" \
+          "platforms;android-31" \
+          "build-tools;31.0.0" \
+          "ndk;23.1.7779620"
 
     - name: Build APK
       run: |
         buildozer android debug --log-level 2
-
+      
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: my-app
+        name: my-kivy-apk
         path: bin/*.apk
